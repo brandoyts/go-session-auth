@@ -6,10 +6,13 @@ services:
     ports:
       - 27017:27017
     environment:
-      MONGO_INITDB_ROOT_USERNAME: rootusername
-      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+      MONGO_INITDB_ROOT_USERNAME: rootusername # for testing
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword # for testing
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     container_name: redis
@@ -21,4 +24,26 @@ services:
       interval: 1s
       timeout: 3s
       retries: 5
-    command: ["redis-server"]
+
+  server:
+    container_name: golang_server
+    # working_dir: /app/cmd/server
+    build:
+      context: .
+      dockerfile: ./cmd/server/dockerfile
+    volumes:
+      - .:/app
+    ports:
+      - 8000:8000
+    environment:
+      MONGO_AUTH_SOURCE: admin
+      MONGO_USERNAME: rootusername
+      MONGO_PASSWORD: rootpassword
+      MONGO_HOST: mongodb # service name
+      MONGO_DATABASE_NAME: go-session-auth
+      REDIS_ADDRESS: redis:6379 # service name
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy

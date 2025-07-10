@@ -38,8 +38,6 @@ func (mr *MongoRepository) FindById(ctx context.Context, id string) (*User, erro
 }
 
 func (mr *MongoRepository) FindOne(ctx context.Context, user User) (*User, error) {
-	user.ID = bson.NewObjectID().Hex()
-
 	var found User
 
 	err := mr.collection.FindOne(ctx, user).Decode(&found)

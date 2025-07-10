@@ -9,13 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/readpref"
 )
 
-func NewMongoDb(database string, url string) (*mongo.Database, error) {
-	credentials := options.Credential{
-		AuthSource: "admin",
-		Username:   "rootusername",
-		Password:   "rootpassword",
-	}
-
+func NewMongoDb(database string, url string, credentials options.Credential) (*mongo.Database, error) {
 	clientOptions := options.Client().ApplyURI(url).SetAuth(credentials)
 
 	client, err := mongo.Connect(clientOptions)
